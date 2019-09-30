@@ -1,0 +1,22 @@
+=============== Sep 28, 2019 (EDT) ===============
+14:59:05.781961 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:59:05.789163 db@open opening
+14:59:05.790128 version@stat F·[] S·0B[] Sc·[]
+14:59:05.793882 db@janitor F·2 G·0
+14:59:05.794812 db@open done T·5.443228ms
+14:59:09.386038 transaction@flush created L0@2 N·2 S·287B "lew..tle,v1":"v|l..tle,v2"
+14:59:09.386209 version@stat F·[1] S·287B[287B] Sc·[0.25]
+14:59:09.517786 transaction@flush created L0@3 N·2 S·271B "lew..loy,v3":"v|l..loy,v4"
+14:59:09.518065 version@stat F·[2] S·558B[558B] Sc·[0.50]
+14:59:09.600250 transaction@flush created L0@4 N·2 S·234B "lew..nel,v5":"v|l..nel,v6"
+14:59:09.600442 version@stat F·[3] S·792B[792B] Sc·[0.75]
+14:59:09.604270 transaction@flush created L0@5 N·2 S·229B "lew..sit,v7":"v|l..sit,v8"
+14:59:09.604377 version@stat F·[4] S·1021B[1021B] Sc·[1.00]
+14:59:09.605767 table@compaction L0·4 -> L1·0 S·1021B Q·8
+14:59:09.608445 table@build created L1@6 N·8 S·553B "lew..tle,v1":"v|l..nel,v6"
+14:59:09.608710 version@stat F·[0 1] S·553B[0B 553B] Sc·[0.00 0.00]
+14:59:09.610164 table@compaction committed F-3 S-468B Ke·0 D·0 T·4.240204ms
+14:59:09.610447 table@remove removed @5
+14:59:09.610600 table@remove removed @4
+14:59:09.610746 table@remove removed @3
+14:59:09.610910 table@remove removed @2
