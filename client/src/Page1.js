@@ -2,6 +2,7 @@ import React from 'react';
 import web3Obj from './helper'
 import ReactPlayer from 'react-player'
 import { Button, Dimmer, Segment,Loader, } from 'semantic-ui-react'
+import queryString from 'query-string'
 
 import './Page1.css';
 
@@ -36,6 +37,10 @@ class Page1 extends React.Component {
   handleHide = () => this.setState({ active: false })
 
   componentDidMount() {
+    const values = queryString.parse(this.props.location.search)
+    console.log("adWalletAddress")
+    console.log(values.adWalletAddress)
+    
     const isTorus = sessionStorage.getItem('pageUsingTorus')
 
 
@@ -56,7 +61,7 @@ class Page1 extends React.Component {
           .then(res => this.setState({ apiResponse: res }))
           .then(res => console.log(this.state.apiResponse))
           .then(  () => {
-            if(this.state.apiResponse == "Success"){
+            if(this.state.apiResponse === "Success"){
               this.props.history.push('/page2/')
             }
           });

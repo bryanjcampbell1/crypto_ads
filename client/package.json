@@ -5,6 +5,9 @@
   "dependencies": {
     "@toruslabs/torus-embed": "0.0.26",
     "celer-web-sdk": "^0.8.3",
+    "ethers": "^4.0.37",
+    "qrcode.react": "^0.9.3",
+    "query-string": "^6.8.3",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-player": "^1.12.0",
