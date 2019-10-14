@@ -53,7 +53,7 @@ class Page1 extends React.Component {
 
   callAPI() {
 
-    let fetchStringWithWalletAddress = "http://localhost:9000/payoutAPI/" + this.state.account;
+    let fetchStringWithWalletAddress = "https://us-central1-cryptoads-77142.cloudfunctions.net/payout?ClientWalletAddress=" + this.state.account;
 
       //fetch("http://localhost:9000/testAPI")
       fetch(fetchStringWithWalletAddress)

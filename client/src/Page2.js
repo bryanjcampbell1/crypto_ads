@@ -14,7 +14,7 @@ class Page2 extends React.Component {
   }
 
   handleClick1 = () => {
-    this.props.history.push('/')
+    this.props.history.push('/page1/')
     
   }
 
