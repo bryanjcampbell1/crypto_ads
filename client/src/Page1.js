@@ -3,13 +3,15 @@ import web3Obj from './helper'
 import ReactPlayer from 'react-player'
 import { Button, Dimmer, Segment,Loader, } from 'semantic-ui-react'
 import queryString from 'query-string'
+import firebase from './firebase';
 
 import './Page1.css';
 
 
 //could query for this list
 
-const urls = [/*'https://www.youtube.com/watch?v=TAZYqXwW5lA',*/
+let urls = ['https://www.youtube.com/watch?v=TAZYqXwW5lA',
+              'https://vimeo.com/265363100',
               'https://vimeo.com/265363100'];
 
 const x = Math.floor(Math.random() * urls.length);
@@ -25,24 +27,54 @@ function Topbar(props) {
 
 class Page1 extends React.Component {
 
-  state = {
-    account: '',
-    balance: '',
-    videoPlayed: false,
-    active: false,
-    apiResponse: "" 
-  }
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      account: '',
+      balance: '',
+      videoPlayed: false,
+      gotLinks: false,
+      active: false,
+      apiResponse: "" 
+    };
+
+}
+
+  
   handleShow = () => this.setState({ active: true })
   handleHide = () => this.setState({ active: false })
 
   componentDidMount() {
     const values = queryString.parse(this.props.location.search)
-    console.log("adWalletAddress")
-    console.log(values.adWalletAddress)
-    
-    const isTorus = sessionStorage.getItem('pageUsingTorus')
+    //var ref = firebase.database().ref('adCampaigns/' + values.adWalletAddress);
 
+      var campaignRef = firebase.database().ref('adCampaigns/' + values.adWalletAddress);
+
+      campaignRef.once('value').then(function(snapshot) {
+        // The first promise succeeded. Save snapshot for later.
+        if ( snapshot.val().link1 != ""){
+          urls[0] = snapshot.val().link1;
+        }
+        if ( snapshot.val().link2 != ""){
+          urls[1] = snapshot.val().link2;
+        }
+        if ( snapshot.val().link3 != ""){
+          urls[2] = snapshot.val().link3;
+        }
+         console.log(snapshot.val().link1);
+         console.log(snapshot.val().link2);
+         console.log(snapshot.val().link3);
+        
+        
+      }).then(() => {
+        this.setState({ gotLinks: true })
+      }, function(error) {
+        // Something went wrong.
+        console.error(error);
+      });
+
+    const isTorus = sessionStorage.getItem('pageUsingTorus')
 
     if (isTorus) {
       web3Obj.initialize().then(() => {
@@ -95,17 +127,17 @@ class Page1 extends React.Component {
 
     const { active } = this.state
 
-      if(!this.state.videoPlayed){
+      if(!this.state.gotLinks ){
         return (
           <div >
             <Topbar title="Play Video to Earn $"/>
-            
-
-          {/* Need to modify react player.  Some mobile browser will require a click to play.  T
-          This will be impossible because click events have been dissabled.
-
-            Need to fix by adding a videoHasStarted function which disables clicking events
-           */}
+          </div>
+        );
+      }
+      else if(!this.state.videoPlayed ){
+        return (
+          <div >
+            <Topbar title="Play Video to Earn $"/>
 
               <ReactPlayer
                 url={ urls[x] } 
