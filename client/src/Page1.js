@@ -41,7 +41,7 @@ class Page1 extends React.Component {
       apiResponse: "" 
     };
 
-}
+  }
 
   
   handleShow = () => this.setState({ active: true })
@@ -75,7 +75,7 @@ class Page1 extends React.Component {
         // Something went wrong.
         console.error(error);
       });
-
+/*
     const isTorus = sessionStorage.getItem('pageUsingTorus')
 
     if (isTorus) {
@@ -83,6 +83,7 @@ class Page1 extends React.Component {
         this.setStateInfo()
       })
     }
+    */
   }
 
 
@@ -103,6 +104,7 @@ class Page1 extends React.Component {
         });
   }
 
+/*
   setStateInfo = () => {
     
     web3Obj.web3.eth.getAccounts().then(accounts => {
@@ -114,6 +116,7 @@ class Page1 extends React.Component {
         }
       })
     })
+    
   }
 
   enableTorus = async () => {
@@ -124,6 +127,14 @@ class Page1 extends React.Component {
     } catch (error) {
       console.error(error)
     }
+  }
+  */
+
+  loadUserWallet = async () => {
+    
+   await this.setState({ account: '0x830c5D312D507DdB066192d34dD6441737e127C8' });
+   this.callAPI();
+      
   }
 
   render() {
@@ -173,9 +184,11 @@ class Page1 extends React.Component {
                   style={{pointeEvents: 'none'}}
                 />
               
-              
+              {/*<div style={{padding:40, backgroundColor: '#282c34', height:150, textAlign:'center' }}>
+              <Button  color='violet' size='huge' onClick={this.enableTorus}>Get Paid!</Button>
+            </div>*/}
             <div style={{padding:40, backgroundColor: '#282c34', height:150, textAlign:'center' }}>
-              <Button  color='violet' size='huge' onClick={this.enableTorus}>Get Payout with Torus!</Button>
+              <Button  color='violet' size='huge' onClick={this.loadUserWallet}>Get Paid!</Button>
             </div>
             </Dimmer.Dimmable>
             
