@@ -5,6 +5,8 @@ import { Button, Dimmer, Segment,Loader, } from 'semantic-ui-react'
 import queryString from 'query-string'
 import firebase from './firebase';
 
+
+
 import './Page1.css';
 
 
@@ -83,20 +85,22 @@ class Page1 extends React.Component {
     }
   }
 
+
+
   callAPI() {
+    const values2 = queryString.parse(this.props.location.search)
 
-    let fetchStringWithWalletAddress = "https://us-central1-cryptoads-77142.cloudfunctions.net/payout?ClientWalletAddress=" + this.state.account;
+    let fetchStringWithWalletAddress = "https://us-central1-cryptoads-77142.cloudfunctions.net/payout2?ClientWalletAddress=" + this.state.account + "&AdWalletPublic=" + values2.adWalletAddress;
 
-      //fetch("http://localhost:9000/testAPI")
-      fetch(fetchStringWithWalletAddress)
-          .then(res => res.text())
-          .then(res => this.setState({ apiResponse: res }))
-          .then(res => console.log(this.state.apiResponse))
-          .then(  () => {
-            if(this.state.apiResponse === "Success"){
-              this.props.history.push('/page2/')
-            }
-          });
+    fetch(fetchStringWithWalletAddress)
+        .then(res => res.text())
+        .then(res => this.setState({ apiResponse: res }))
+        .then(res => console.log(this.state.apiResponse))
+        .then(  () => {
+          if(this.state.apiResponse === "Success"){
+            this.props.history.push('/page2/')
+          }
+        });
   }
 
   setStateInfo = () => {
@@ -107,7 +111,6 @@ class Page1 extends React.Component {
         this.setState({ balance: balance })
         if(this.state.videoPlayed){
           this.callAPI();
-          //this.props.history.push('/page2/')
         }
       })
     })
@@ -137,7 +140,7 @@ class Page1 extends React.Component {
       else if(!this.state.videoPlayed ){
         return (
           <div >
-            <Topbar title="Play Video to Earn $"/>
+            <Topbar title="Play & Earn $"/>
 
               <ReactPlayer
                 url={ urls[x] } 
@@ -161,7 +164,7 @@ class Page1 extends React.Component {
           <div>
           <Dimmer.Dimmable as={Segment} blurring dimmed={active} style={{padding:0 }}>
           
-            <Topbar title="Thanks for Watching!"/>
+            <Topbar title="Thanks!"/>
 
             
                 <ReactPlayer
@@ -172,7 +175,7 @@ class Page1 extends React.Component {
               
               
             <div style={{padding:40, backgroundColor: '#282c34', height:150, textAlign:'center' }}>
-              <Button  color='violet' size='huge' onClick={this.enableTorus}>Get Payout with Tourus!</Button>
+              <Button  color='violet' size='huge' onClick={this.enableTorus}>Get Payout with Torus!</Button>
             </div>
             </Dimmer.Dimmable>
             

@@ -14,7 +14,10 @@ import { ethers } from 'ethers';
 import './NewCampaign.css';
 import firebase from './firebase';
 
+//import ethers from 'ethers';
+
 let provider = ethers.getDefaultProvider('ropsten');
+let testWallet = '0x830c5D312D507DdB066192d34dD6441737e127C8';
 
 class NewCampaign extends React.Component {
   constructor(props) {
@@ -35,11 +38,6 @@ class NewCampaign extends React.Component {
 
   }
 
-
-  
-
-    
-
   componentDidMount() {
     this.timerID = setInterval(
       () => this.tick(),
@@ -47,9 +45,6 @@ class NewCampaign extends React.Component {
     );
   }
 
-  //lifecycle? 
-  //trigger a function on state change
-  //in this case when linksSubmitted= true and  accountEmpty = false
 
   componentWillUnmount() {
     clearInterval(this.timerID);
@@ -89,13 +84,29 @@ class NewCampaign extends React.Component {
 
   submitButton = () => {
     console.log( " QR code takes you to https://cryptoads-77142.firebaseapp.com/page1/?adWalletAddress=" + this.state.adWallet.address);
-    this.uploadLinks();
+    this.uploadKeys();
     
+  }
+  
+
+  uploadKeys = () => {
+
+    firebase.database().ref('keypairs/' + this.state.adWallet.address).set({
+        privateKey: this.state.adWallet.privateKey
+    }).then(() => {
+        console.log("Keys successfully written!");
+        this.uploadLinks();
+    })
+    .catch(() => {
+        this.setState({
+            problemSubmitting: true 
+        })
+      }
+    );
+
   }
 
   uploadLinks = () => {
-
-
 
     firebase.database().ref('adCampaigns/' + this.state.adWallet.address).set({
         link1: this.state.link1,
@@ -112,7 +123,6 @@ class NewCampaign extends React.Component {
       }
     );
     
-
 
   }
 

@@ -3,79 +3,57 @@ const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
 
 admin.initializeApp();
+var db = admin.database();
+
 
 var ethers = require('ethers');
 let provider = ethers.getDefaultProvider('ropsten');
 
-var publicKey = '0x7002c6A71E64ffb7C65b0f8643348860Bd673261';
-var privateKey = '6b866d98d0312d1460ebacda6cdb0166ad9ab9bcbbf0e1891e5d709748713627';
-var wallet = new ethers.Wallet(privateKey,provider);
-
-
-
-exports.payout = functions.https.onRequest((req, res) => {
-  cors(req, res, () => {
-
-  	let clientWallet = req.query.ClientWalletAddress;
-
-	let amount = ethers.utils.parseEther('1.0');
-
-	let tx = {
-	    to: String(clientWallet) ,
-	    value: amount
-	};
-
-	let sendPromise = wallet.sendTransaction(tx);
-
-	sendPromise.then((tx) => {
-	    console.log(tx);
-	});
-
-    res.send('Success')
-
-  });
-});
-
-/*
-import * as cors from 'cors';
-const corsHandler = cors({origin: true});
-
-export const pingFunctionWithCorsAllowed = functions.https.onRequest((request, response) => {
-  corsHandler(request, response, () => {
-    response.send(`Ping from Firebase (with CORS handling)! ${new Date().toISOString()}`);
-  });
-});
-
-
-
-
-
-// The Firebase Admin SDK to access the Firebase Realtime Database.
-
-
-
-exports.payout = functions.https.onRequest(async (req, res) => {
-
+exports.payout2 = functions.https.onRequest((req, res) => {
+cors(req, res, () => {
 
 	let clientWallet = req.query.ClientWalletAddress;
+  	let adWalletPublic = req.query.AdWalletPublic;
 
-	let amount = ethers.utils.parseEther('1.0');
+  	//let testWallet = '0x830c5D312D507DdB066192d34dD6441737e127C8';
+    //let testAdWallet = '0x41C28B83D860119c1e0a4e38938C5Ee4F1348363';
 
-	let tx = {
-	    to: String(clientWallet) ,
-	    value: amount
-	};
+    var ref = db.ref('keypairs/' + adWalletPublic);
+    //var ref = db.ref('keypairs/' + testAdWallet);
 
-	let sendPromise = wallet.sendTransaction(tx);
+    ref.on("value", function(snapshot) {
+      	console.log(snapshot.val().privateKey);
 
-	sendPromise.then((tx) => {
-	    console.log(tx);
-	});
+    
+        var wallet = new ethers.Wallet(snapshot.val().privateKey,provider);
 
-    res.send('Success')
+        let amount = ethers.utils.parseEther('1.0');
 
-  }
+        let tx = {
+          to: String(clientWallet) ,
+          //to: testWallet,
+          value: amount
+        };
 
-);
+        let sendPromise = wallet.sendTransaction(tx);
 
-*/
+        sendPromise.then((tx) => {
+          console.log(tx);
+        }).then(() => {
+          console.log("here3");
+          //res.send('Success');
+        });
+
+		//res.send('Success');
+
+    }, function (errorObject) {
+      console.log("The read failed: " + errorObject.code);
+    });
+
+
+
+	 //console.log('yo');
+     res.status(200).send('Success');
+   })
+});
+
