@@ -3,14 +3,44 @@ import web3Obj from './helper'
 import ReactPlayer from 'react-player'
 import { Button, Dimmer, Segment,Loader, } from 'semantic-ui-react'
 import queryString from 'query-string'
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from './firebase';
-
-
 
 import './Page1.css';
 
 
-//could query for this list
+
+/*
+
+var user = firebase.auth().currentUser;
+var name, email, photoUrl, uid, emailVerified;
+
+if (user != null) {
+  name = user.displayName;
+  email = user.email;
+  photoUrl = user.photoURL;
+  emailVerified = user.emailVerified;
+  uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
+                   // this value to authenticate with your backend server, if
+                   // you have one. Use User.getToken() instead.
+}
+
+
+*/
+
+
+
+const uiConfig = {
+  // Popup signin flow rather than redirect flow.
+  signInFlow: 'redirect',
+  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
+  signInSuccessUrl: '/page2',
+  // We will display Google and Facebook as auth providers.
+  signInOptions: [
+    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    //firebase.auth.FacebookAuthProvider.PROVIDER_ID
+  ]
+};
 
 let urls = ['https://www.youtube.com/watch?v=TAZYqXwW5lA',
               'https://vimeo.com/265363100',
@@ -49,9 +79,14 @@ class Page1 extends React.Component {
 
   componentDidMount() {
     const values = queryString.parse(this.props.location.search)
-    //var ref = firebase.database().ref('adCampaigns/' + values.adWalletAddress);
-
+    
       var campaignRef = firebase.database().ref('adCampaigns/' + values.adWalletAddress);
+      
+      if(values.adWalletAddress == null ){
+        campaignRef = firebase.database().ref('adCampaigns/0x619e4bc22CB5079D154640c1ba2fCC936A12606e');
+      }
+      
+      
 
       campaignRef.once('value').then(function(snapshot) {
         // The first promise succeeded. Save snapshot for later.
@@ -176,26 +211,22 @@ class Page1 extends React.Component {
           <Dimmer.Dimmable as={Segment} blurring dimmed={active} style={{padding:0 }}>
           
             <Topbar title="Thanks!"/>
-
-            
-                <ReactPlayer
-                  url={ urls[x] } 
-                  width='100%'
-                  style={{pointeEvents: 'none'}}
-                />
-              
-              {/*<div style={{padding:40, backgroundColor: '#282c34', height:150, textAlign:'center' }}>
-              <Button  color='violet' size='huge' onClick={this.enableTorus}>Get Paid!</Button>
-            </div>*/}
-            <div style={{padding:40, backgroundColor: '#282c34', height:150, textAlign:'center' }}>
-              <Button  color='violet' size='huge' onClick={this.loadUserWallet}>Get Paid!</Button>
+            <ReactPlayer
+              url={ urls[x] } 
+              width='100%'
+              style={{pointeEvents: 'none'}}
+            />
+            <div style={{backgroundColor: '#282c34', height:100, textAlign:'center' }}>
+              <h4>Claim $$</h4>
+              <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
             </div>
-            </Dimmer.Dimmable>
+             
+          </Dimmer.Dimmable>
             
             
-              <Dimmer active={this.state.active}>
-                <Loader inverted>Loading</Loader>
-              </Dimmer>
+          <Dimmer active={this.state.active}>
+            <Loader inverted>Loading</Loader>
+          </Dimmer>
 
           </div>
         );

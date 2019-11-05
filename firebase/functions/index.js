@@ -27,7 +27,7 @@ cors(req, res, () => {
     
         var wallet = new ethers.Wallet(snapshot.val().privateKey,provider);
 
-        let amount = ethers.utils.parseEther('1.0');
+        let amount = ethers.utils.parseEther('0.001');
 
         let tx = {
           to: String(clientWallet) ,
