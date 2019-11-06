@@ -1,3 +1,10 @@
+/*
+ Two possibilities
+  i) return to page1 after google sign in without distroying state --> then move to page2
+  ii) pass in a param into redirect url and move to page 2 directly 
+*/
+
+
 import React from 'react';
 import web3Obj from './helper'
 import ReactPlayer from 'react-player'
@@ -9,44 +16,26 @@ import firebase from './firebase';
 import './Page1.css';
 
 
-
-/*
-
-var user = firebase.auth().currentUser;
-var name, email, photoUrl, uid, emailVerified;
-
-if (user != null) {
-  name = user.displayName;
-  email = user.email;
-  photoUrl = user.photoURL;
-  emailVerified = user.emailVerified;
-  uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
-                   // this value to authenticate with your backend server, if
-                   // you have one. Use User.getToken() instead.
-}
-
-
-*/
-
-
-
-const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: 'redirect',
-  // Redirect to /signedIn after sign in is successful. Alternatively you can provide a callbacks.signInSuccess function.
-  signInSuccessUrl: '/page2',
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [
-    firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    //firebase.auth.FacebookAuthProvider.PROVIDER_ID
-  ]
-};
-
 let urls = ['https://www.youtube.com/watch?v=TAZYqXwW5lA',
               'https://vimeo.com/265363100',
               'https://vimeo.com/265363100'];
 
 const x = Math.floor(Math.random() * urls.length);
+
+const uiConfig = {
+  
+      signInFlow: 'popup',
+      //signInSuccessUrl: '/page2/?adWalletAddress=' + this.state.adWalletAddress,
+      signInSuccessUrl: '/page1/',
+      signInOptions: [
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        //firebase.auth.FacebookAuthProvider.PROVIDER_ID
+      ],
+      callbacks: {
+        // Avoid redirects after sign-in.
+        signInSuccessWithAuthResult: () => false
+      }
+    };
 
 function Topbar(props) {
   return (
@@ -62,12 +51,14 @@ class Page1 extends React.Component {
   constructor(props) {
     super(props);
 
+    const values = queryString.parse(this.props.location.search)
+
     this.state = {
-      account: '',
-      balance: '',
+      adWalletAddress: values.adWalletAddress,
       videoPlayed: false,
       gotLinks: false,
       active: false,
+      isSignedIn: false, // Local signed-in state.
       apiResponse: "" 
     };
 
@@ -78,7 +69,27 @@ class Page1 extends React.Component {
   handleHide = () => this.setState({ active: false })
 
   componentDidMount() {
-    const values = queryString.parse(this.props.location.search)
+
+      if(this.state.isSignedIn){
+        console.log("Test Point 1: True");
+      }
+      else{
+        console.log("Test Point 1: False");
+      }
+
+
+      this.unregisterAuthObserver = firebase.auth().onAuthStateChanged(
+          (user) => this.setState({isSignedIn: !!user})
+      );
+
+      if(this.state.isSignedIn){
+        console.log("Test Point 2: True");
+      }
+      else{
+        console.log("Test Point 2: False");
+      }
+
+      const values = queryString.parse(this.props.location.search)
     
       var campaignRef = firebase.database().ref('adCampaigns/' + values.adWalletAddress);
       
@@ -110,69 +121,15 @@ class Page1 extends React.Component {
         // Something went wrong.
         console.error(error);
       });
-/*
-    const isTorus = sessionStorage.getItem('pageUsingTorus')
 
-    if (isTorus) {
-      web3Obj.initialize().then(() => {
-        this.setStateInfo()
-      })
-    }
-    */
   }
 
-
-
-  callAPI() {
-    const values2 = queryString.parse(this.props.location.search)
-
-    let fetchStringWithWalletAddress = "https://us-central1-cryptoads-77142.cloudfunctions.net/payout2?ClientWalletAddress=" + this.state.account + "&AdWalletPublic=" + values2.adWalletAddress;
-
-    fetch(fetchStringWithWalletAddress)
-        .then(res => res.text())
-        .then(res => this.setState({ apiResponse: res }))
-        .then(res => console.log(this.state.apiResponse))
-        .then(  () => {
-          if(this.state.apiResponse === "Success"){
-            this.props.history.push('/page2/')
-          }
-        });
-  }
-
-/*
-  setStateInfo = () => {
-    
-    web3Obj.web3.eth.getAccounts().then(accounts => {
-      this.setState({ account: accounts[0] })
-      web3Obj.web3.eth.getBalance(accounts[0]).then(balance => {
-        this.setState({ balance: balance })
-        if(this.state.videoPlayed){
-          this.callAPI();
-        }
-      })
-    })
-    
-  }
-
-  enableTorus = async () => {
-    this.handleShow()
-    try {
-      await web3Obj.initialize()
-      this.setStateInfo()
-    } catch (error) {
-      console.error(error)
-    }
-  }
-  */
-
-  loadUserWallet = async () => {
-    
-   await this.setState({ account: '0x830c5D312D507DdB066192d34dD6441737e127C8' });
-   this.callAPI();
-      
+  componentWillUnmount() {
+    this.unregisterAuthObserver();
   }
 
   render() {
+    
 
     const { active } = this.state
 
@@ -183,7 +140,7 @@ class Page1 extends React.Component {
           </div>
         );
       }
-      else if(!this.state.videoPlayed ){
+      if(!this.state.videoPlayed ){
         return (
           <div >
             <Topbar title="Play & Earn $"/>
@@ -201,23 +158,38 @@ class Page1 extends React.Component {
               className="Player"  
               />
             
-            <div style={{backgroundColor: '#282c34', height:150, textAlign:'center' }}></div>
           </div>
         );
       }
       else{
+        if(this.state.isSignedIn){
+          console.log("Test Point 3: True");
+          var user = firebase.auth().currentUser;
+          var name, email, photoUrl, uid, emailVerified;
+
+          if (user != null) {
+            name = user.displayName;
+            email = user.email;
+            photoUrl = user.photoURL;
+            emailVerified = user.emailVerified;
+            uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
+                             // this value to authenticate with your backend server, if
+                             // you have one. Use User.getToken() instead.
+          }
+          console.log(name);
+          console.log(uid);
+        }
+        else{
+          console.log("Test Point 3: False");
+        }
         return (
           <div>
           <Dimmer.Dimmable as={Segment} blurring dimmed={active} style={{padding:0 }}>
           
             <Topbar title="Thanks!"/>
-            <ReactPlayer
-              url={ urls[x] } 
-              width='100%'
-              style={{pointeEvents: 'none'}}
-            />
+            
             <div style={{backgroundColor: '#282c34', height:100, textAlign:'center' }}>
-              <h4>Claim $$</h4>
+              <h2 style={{padding:40, color:'white', fontSize:34}}>Claim $$</h2>
               <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>
             </div>
              
