@@ -9,6 +9,25 @@ var db = admin.database();
 var ethers = require('ethers');
 let provider = ethers.getDefaultProvider('ropsten');
 
+
+exports.createNewUserData = functions.auth.user().onCreate((user) => {
+  //create new public private key pair for account
+  //update User Ethereum Accounts data table with 1)user id 2) public key 3) private key
+  let randomWallet = ethers.Wallet.createRandom();
+  let user_pk = randomWallet.privateKey; 
+  let user_pubk = randomWallet.address; 
+  let userId = user.uid;
+
+  db.ref('users/' + userId).set({
+    privateKey: user_pk,
+    publicKey: user_pubk
+  });
+
+
+
+});
+
+
 exports.payout2 = functions.https.onRequest((req, res) => {
 cors(req, res, () => {
 
